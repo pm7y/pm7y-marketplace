@@ -1,0 +1,10 @@
+{
+  "name": "pm7y-claude-code",
+  "version": "1.8.1",
+  "description": "Personal Claude Code setup with commands, skills, agents, and MCP servers",
+  "author": {
+    "name": "pm7y",
+    "email": "3075792+pm7y@users.noreply.github.com"
+  },
+  "mcpServers": "./.mcp.json"
+}
