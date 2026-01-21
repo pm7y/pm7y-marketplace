@@ -1,6 +1,6 @@
 {
   "name": "pm7y-claude-code",
-  "version": "1.20.2",
+  "version": "1.22.0",
   "description": "Personal Claude Code setup with commands, skills, agents, and MCP servers",
   "author": {
     "name": "pm7y",
