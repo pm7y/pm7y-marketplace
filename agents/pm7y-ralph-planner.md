@@ -129,7 +129,7 @@ Generate a TASKS.md file with this structure:
 ```markdown
 # Task Instructions
 
-You are running in autonomous loop mode. Complete the following tasks.
+You are running in autonomous loop mode. Each iteration completes exactly ONE task, then exits. The loop script handles spawning fresh sessions.
 
 ## Context
 
@@ -144,29 +144,31 @@ Before completing ANY iteration, you MUST:
 
 1. **Read learnings first** - Check the Learnings Log before starting work
 2. **Run the build** after any code change - iteration fails if build fails
-3. **Run tests** - iteration fails if tests fail (add tests if coverage is inadequate)
+3. **Run tests** - iteration fails if tests fail (only add tests if the current task requires them)
 4. **Check for warnings** - address compiler/linter warnings, don't ignore them
 5. **Roll back on failure** - if validation fails after 2-3 attempts, `git checkout .` and document learnings
 6. **Document before exiting** - always update Learnings Log with insights from failed attempts
 
 ## Rules
 
-1. Focus on ONE task per iteration
+1. **ONE task per iteration, then STOP** - Complete exactly one task, then exit
 2. Run validation after every code change
 3. Mark tasks complete with `[x]` when done
-4. Commit after each successful task (never commit broken code)
-5. If blocked, document in Learnings Log and move to next task
+4. If blocked after 2-3 attempts, rollback, document in Learnings Log, then EXIT (next iteration will try another task)
+5. Do NOT commit - the loop script handles commits via -AutoCommit flag
+6. **EXIT after ONE task** - Do not continue to additional tasks in the same iteration
 
 ## Iteration Workflow
 
 ```
 1. Read the Learnings Log for context from previous attempts
-2. Pick ONE task from the list
+2. Pick the FIRST incomplete task (Critical → High → Medium → Low, then document order within each level)
 3. Make the change
-4. Run build → if fails, fix and retry
-5. Run tests → if fails, fix and retry
-6. If validation passes → commit and mark task complete
-7. If validation fails repeatedly → rollback, document learnings, move on
+4. Run build → if fails, fix and retry (max 2-3 attempts)
+5. Run tests → if fails, fix and retry (max 2-3 attempts)
+6. If validation passes → mark task complete → EXIT
+7. If validation fails repeatedly → rollback, document learnings → EXIT
+8. STOP - Do NOT proceed to another task. The loop will start a fresh iteration.
 ```
 
 ## Tasks
@@ -255,7 +257,9 @@ Once approved:
 1. **Backup existing** - If TASKS.md exists, copy to TASKS.md.bak
 2. **Write file** - Save TASKS.md to project root
 3. **Confirm** - "TASKS.md created with X tasks."
-4. **Next steps** - "Run `/pm7y-ralph-loop` to set up autonomous execution, or use the `pm7y-ralph-tasks` agent directly."
+4. **Next steps** - Explain the two execution options:
+   - **`/pm7y-ralph-loop`** (recommended): Sets up scripts for fresh Claude sessions per task - best for long-running work
+   - **`pm7y-ralph-tasks` agent**: Completes all tasks in one session using worker subagents - faster but uses more context
 
 ## Example Session
 

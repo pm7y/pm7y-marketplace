@@ -18,7 +18,7 @@ Set up Ralph Wiggum scripts for autonomous Claude execution in this project.
    - `${CLAUDE_PLUGIN_ROOT}/skills/pm7y-ralph-loop/ralph-loop.ps1` → `./ralph-loop.ps1`
    - `${CLAUDE_PLUGIN_ROOT}/skills/pm7y-ralph-loop/ralph-once.ps1` → `./ralph-once.ps1`
 
-3. **Check for TASKS.md** - If it doesn't exist, ask the user if they want a template created
+3. **Check for TASKS.md** - If it doesn't exist, suggest running `/pm7y-ralph-planner` to create a properly structured TASKS.md with validation requirements and learnings tracking
 
 4. **Show usage:**
 

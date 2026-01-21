@@ -1,6 +1,7 @@
 ---
-description: Analyze a .NET 8 codebase and generate UPGRADE_TASKS.md for upgrading to .NET 10
+description: Analyze a .NET 8 codebase for upgrading to .NET 10. Passes findings to pm7y-ralph-planner for TASKS.md generation.
+allowed-tools: Read, Write, Grep, Glob, Bash, Task
 skill: pm7y-dotnet-upgrade
 ---
 
-Analyze this codebase and generate UPGRADE_TASKS.md with all tasks needed to upgrade from .NET 8 to .NET 10. $ARGUMENTS
+Analyze this codebase for .NET 10 upgrade. Pass your findings to the `pm7y-ralph-planner` agent (via Task tool) to generate a TASKS.md file with validation requirements and learnings tracking for autonomous execution: $ARGUMENTS

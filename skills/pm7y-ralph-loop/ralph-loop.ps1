@@ -154,7 +154,17 @@ $untrackedFiles
                     $commitMsg = "ralph: iteration $iteration changes"
                 }
 
+                # Add all changes except Ralph Loop infrastructure files
                 git add -A
+                git reset HEAD -- $PromptFile ralph-once.ps1 ralph-loop.ps1 2>$null
+
+                # Check if there are still staged changes after exclusions
+                $stagedChanges = git diff --cached --name-only 2>$null
+                if (-not $stagedChanges) {
+                    Write-Host "[AutoCommit] No changes to commit (only excluded files modified)"
+                    continue
+                }
+
                 git commit -m $commitMsg 2>$null
 
                 if ($LASTEXITCODE -eq 0) {
