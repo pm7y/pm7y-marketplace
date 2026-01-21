@@ -1,6 +1,6 @@
 ---
-description: Upgrade a .NET project from .NET 8 to .NET 10 using a phased approach
-agent: pm7y-dotnet-10-upgrader
+description: Analyze a .NET 8 codebase and generate UPGRADE_TASKS.md for upgrading to .NET 10
+skill: pm7y-dotnet-upgrade
 ---
 
-Upgrade this codebase from .NET 8 to .NET 10 using the phased approach: $ARGUMENTS
+Analyze this codebase and generate UPGRADE_TASKS.md with all tasks needed to upgrade from .NET 8 to .NET 10. $ARGUMENTS

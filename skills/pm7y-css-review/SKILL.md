@@ -1,12 +1,12 @@
 ---
 name: pm7y-css-review
-description: Reviews CSS/SCSS changes in the current branch for over-specificity, missed reuse opportunities, and over-engineered abstractions. Outputs prioritized tasks to STYLE_TASKS.md. Use when reviewing CSS changes before commit or PR, or to audit existing styles. Supports @file syntax to target specific files.
-allowed-tools: Read, Write, Grep, Glob, Bash
+description: Reviews CSS/SCSS changes in the current branch for over-specificity, missed reuse opportunities, and over-engineered abstractions. Produces analysis findings and uses pm7y-ralph-planner to generate TASKS.md for autonomous execution. Use when reviewing CSS changes before commit or PR, or to audit existing styles. Supports @file syntax to target specific files.
+allowed-tools: Read, Write, Grep, Glob, Bash, Task
 ---
 
 # CSS/SCSS Review Skill
 
-Reviews CSS/SCSS changes for unnecessary complexity and missed reuse opportunities.
+Reviews CSS/SCSS changes for unnecessary complexity and missed reuse opportunities. Produces analysis findings that are passed to `pm7y-ralph-planner` for TASKS.md generation.
 
 ---
 
@@ -17,6 +17,8 @@ This skill analyzes CSS/SCSS files for three categories of issues:
 - **Over-specificity** - Complex selectors that could be simpler
 - **Missing reuse** - New styles that duplicate existing utilities
 - **Over-engineered abstractions** - Unnecessary mixins/variables/extends
+
+**Output:** Analysis findings passed to `pm7y-ralph-planner`, which generates a `TASKS.md` file with validation requirements and learnings tracking for autonomous execution via `pm7y-ralph-loop`.
 
 **When to use:**
 
@@ -127,50 +129,80 @@ For each file in scope, read the content and check for issues:
 | `@extend` usage | Any use of `@extend` | Low |
 | Deep SCSS nesting | > 3 levels of SCSS nesting | Low |
 
-### Step 5: Generate STYLE_TASKS.md
+### Step 5: Pass Findings to pm7y-ralph-planner
 
-Create the output file with this exact format:
+After completing the analysis, invoke the `pm7y-ralph-planner` agent using the Task tool. Pass your findings as structured input so the planner can generate a proper TASKS.md with validation requirements and learnings tracking.
 
-```markdown
-# CSS/SCSS Review Tasks
+**Invoke pm7y-ralph-planner with this prompt:**
 
-*Generated: [YYYY-MM-DD]*
-*Branch: [current branch name]*
-*Files reviewed: [count]*
+```
+Generate a TASKS.md for CSS/SCSS refactoring.
 
----
+## Goal
+Fix CSS/SCSS issues identified during code review.
 
-## [filepath]
+## Project Context
+- **Branch:** [current branch name]
+- **Files reviewed:** [count]
+- **Issues found:** [X total] ([Y] high, [Z] medium, [W] low)
+- **CSS Framework:** [Tailwind/Bootstrap/Custom/None]
+- **Build command:** [detected build command, e.g., npm run build]
+- **Lint command:** [detected lint command, if any]
 
-### High Priority
+## Findings
 
-- [ ] **#N** (Line X): [Issue description]. [Recommendation].
+### HIGH Priority (should be fixed first)
 
-### Medium Priority
+- **[filepath]:[line]** - [Issue type]: [Description]. **Fix:** [Specific action to take].
 
-- [ ] **#N** (Line X): [Issue description]. [Recommendation].
+[Repeat for each high priority finding]
 
-### Low Priority
+### MEDIUM Priority
 
-- [ ] **#N** (Line X): [Issue description]. [Recommendation].
+- **[filepath]:[line]** - [Issue type]: [Description]. **Fix:** [Specific action to take].
 
----
+[Repeat for each medium priority finding]
 
-## [next filepath]
+### LOW Priority (fix if time permits)
 
-...
+- **[filepath]:[line]** - [Issue type]: [Description]. **Fix:** [Specific action to take].
+
+[Repeat for each low priority finding]
+
+## Notes
+- Each fix should be verified by running the build/lint commands
+- Verify changes don't break existing styles visually
 ```
 
-**Formatting rules:**
-- Task numbers are sequential across entire document (not per file)
-- Group tasks by file, then by severity within each file
-- Omit empty priority sections (don't show "High Priority" with no items)
-- Include the specific line number(s) where the issue occurs
-- Provide concrete recommendation with existing class/variable names when applicable
+**Example findings to pass:**
+
+```markdown
+### HIGH Priority
+
+- **src/components/Card.scss:42** - Duplicate utility: `display: flex; justify-content: center; align-items: center;` duplicates existing `.flex-center` class. **Fix:** Remove these properties and add `@extend .flex-center;` or apply `.flex-center` class in HTML.
+- **src/styles/modal.scss:18** - Framework duplicate: `margin-left: auto; margin-right: auto;` available as Tailwind `mx-auto`. **Fix:** Remove CSS properties and add `mx-auto` class to element in JSX/HTML.
+
+### MEDIUM Priority
+
+- **src/components/Header.scss:67** - Deep nesting: Selector `.header .nav .menu .item a` has 5 levels. **Fix:** Flatten to `.header-nav-link` or similar BEM-style class.
+- **src/styles/buttons.scss:23** - Single-use mixin: `@mixin button-shadow` is only used once. **Fix:** Inline the mixin content directly into `.primary-button`.
+
+### LOW Priority
+
+- **src/styles/layout.scss:89** - Over-qualified selector: `div.container` can be simplified. **Fix:** Remove element qualifier, use `.container` only.
+```
+
+**Why use pm7y-ralph-planner:**
+
+The planner will:
+1. Add proper validation requirements (build, lint checks)
+2. Include the Learnings Log section for preserving insights across iterations
+3. Add the iteration workflow guidance
+4. Format tasks for optimal autonomous execution
 
 ### Step 6: Report Summary and Stop
 
-After writing STYLE_TASKS.md, output a brief summary:
+After invoking pm7y-ralph-planner, output a brief summary:
 
 ```
 CSS Review Complete
@@ -178,7 +210,8 @@ CSS Review Complete
 Files reviewed: N
 Issues found: X (Y high, Z medium, W low)
 
-Tasks written to STYLE_TASKS.md
+TASKS.md generated via pm7y-ralph-planner - ready for ralph-loop execution:
+  pwsh ./ralph-loop.ps1 -PromptFile TASKS.md
 ```
 
 Then STOP. Do not attempt to fix any issues.
@@ -270,30 +303,36 @@ ALWAYS check for CSS frameworks. Tailwind and Bootstrap provide extensive utilit
 
 ### Rule 3: Line Numbers Required
 
-EVERY issue MUST include specific line number(s). Vague references like "in this file" are not acceptable.
+EVERY finding MUST include specific line number(s). Vague references like "in this file" are not acceptable.
 
-### Rule 4: Actionable Recommendations
+### Rule 4: Actionable Fix Instructions
 
-EVERY issue MUST include a concrete recommendation. Name specific existing classes, variables, or utility names when suggesting reuse.
+EVERY finding MUST include a concrete **Fix:** instruction. Name specific existing classes, variables, or utility names when suggesting reuse. The fix must be specific enough for autonomous execution.
 
-### Rule 5: Stop After Output
+### Rule 5: Use pm7y-ralph-planner
 
-After writing STYLE_TASKS.md, STOP. Do not modify any CSS files. Do not attempt to fix issues. The user will decide what to fix.
+ALWAYS pass findings to `pm7y-ralph-planner` for TASKS.md generation. This ensures proper validation requirements, learnings tracking, and iteration workflow are included.
+
+### Rule 6: Stop After Output
+
+After invoking pm7y-ralph-planner, STOP. Do not modify any CSS files. Do not attempt to fix issues. The user will run ralph-loop to fix them.
 
 ---
 
 ## Validation Checklist
 
-Before finalizing:
+Before passing findings to pm7y-ralph-planner:
 
 - [ ] Parsed arguments correctly (@file or branch diff)
 - [ ] Built style inventory from all project CSS/SCSS files
 - [ ] Checked for Tailwind, Bootstrap, or custom utility systems
 - [ ] Analyzed all files in scope
-- [ ] Every issue has line number(s)
-- [ ] Every issue has concrete recommendation
-- [ ] Task numbers are sequential across document
-- [ ] Tasks grouped by file, then by severity
-- [ ] STYLE_TASKS.md written to project root
+- [ ] Every finding has exact file path and line number
+- [ ] Every finding has clear issue description
+- [ ] Every finding has specific **Fix:** instruction
+- [ ] Findings grouped by priority (HIGH → MEDIUM → LOW)
+- [ ] Findings ordered by file path within each priority section
+- [ ] Empty priority sections omitted
+- [ ] Invoked pm7y-ralph-planner with structured findings
 - [ ] Summary output provided
 - [ ] DID NOT attempt to fix any issues

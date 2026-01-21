@@ -1,12 +1,12 @@
 ---
 name: pm7y-codebase-review
-description: Reviews a codebase for style consistency, patterns, idioms, and adherence to KISS, DRY, POLA, and YAGNI principles. Automatically detects languages/frameworks present and applies appropriate analysis. Use when performing code audits, before major refactoring, or to establish coding standards. Outputs timestamped findings to CODEBASE_REVIEW.md with actionable tasks.
+description: Reviews a codebase for style consistency, patterns, idioms, and adherence to KISS, DRY, POLA, YAGNI principles. Automatically detects languages/frameworks present and applies appropriate analysis. Produces analysis findings and uses pm7y-ralph-planner to generate TASKS.md for autonomous execution.
 allowed-tools: Read, Write, Edit, Grep, Glob, Task, WebFetch, mcp__context7__resolve-library-id, mcp__context7__query-docs
 ---
 
 # Codebase Review Skill
 
-Reviews codebases for consistency, patterns, and adherence to software engineering principles.
+Reviews codebases for consistency, patterns, and adherence to software engineering principles. Produces analysis findings that are passed to `pm7y-ralph-planner` for TASKS.md generation.
 
 ---
 
@@ -20,13 +20,14 @@ This skill performs comprehensive codebase analysis focusing on:
 - **Complexity reduction** - Identifying unnecessary complexity
 - **Duplication detection** - Finding repeated code patterns
 
+**Output:** Analysis findings passed to `pm7y-ralph-planner`, which generates a `TASKS.md` file with validation requirements and learnings tracking for autonomous execution via `pm7y-ralph-loop`.
+
 **When to use:**
 
-- Periodic codebase health checks
+- Periodic codebase health checks with automated fixes
 - Before major refactoring efforts
-- Establishing or documenting coding standards
-- Onboarding new team members to codebase conventions
-- After rapid feature development to assess technical debt
+- Autonomous code quality improvement sessions
+- After rapid feature development to address technical debt
 
 ---
 
@@ -76,7 +77,7 @@ Scan the codebase to identify all languages and frameworks present. Look for:
 | **Kotlin** | `build.gradle.kts`, `.kt` files |
 | **Swift** | `Package.swift`, `.swift` files, `.xcodeproj` |
 
-**Record detected languages** for use in the report structure and to guide analysis focus.
+**Record detected languages** for use in task grouping and analysis focus.
 
 ### Step 3: Analyze Code by Language
 
@@ -181,7 +182,7 @@ For languages not covered above, use Context7 to look up current best practices:
 - Logging patterns
 - Error handling consistency
 
-### Step 5: Apply Engineering Principles
+### Step 4: Apply Engineering Principles
 
 Evaluate code against each principle:
 
@@ -211,7 +212,7 @@ Evaluate code against each principle:
 
 See [principles-reference.md](principles-reference.md) for detailed examples.
 
-### Step 6: Use Context7 for Documentation
+### Step 5: Use Context7 for Documentation
 
 When evaluating idioms or best practices, use Context7 MCP tools to look up:
 
@@ -222,61 +223,72 @@ When evaluating idioms or best practices, use Context7 MCP tools to look up:
 
 This ensures recommendations align with current (not outdated) best practices.
 
-### Step 7: Generate Report
+### Step 6: Pass Findings to pm7y-ralph-planner
 
-Create or append to `CODEBASE_REVIEW.md` with this structure:
+After completing the analysis, invoke the `pm7y-ralph-planner` agent using the Task tool. Pass your findings as structured input so the planner can generate a proper TASKS.md with validation requirements and learnings tracking.
 
-```markdown
-## Review: [Date and Time]
+**Invoke pm7y-ralph-planner with this prompt:**
 
-### Summary
-
-Brief overview of findings (2-3 sentences).
-
-### Detected Technologies
-
-- **Languages**: [List detected languages, e.g., TypeScript, Python, Go]
-- **Frameworks**: [List detected frameworks, e.g., React, FastAPI, Gin]
-- **Build Tools**: [List build tools, e.g., npm, pip, cargo]
-
-### [Language/Area] Analysis
-
-*Repeat this section for each detected language or logical area (e.g., "TypeScript/React Analysis", "Python Backend Analysis", "Go Services Analysis").*
-
-#### Patterns Identified
-- [Pattern 1]: Description and where used
-- [Pattern 2]: Description and where used
-
-#### Inconsistencies Found
-- [Issue 1]: Description, files affected, recommendation
-- [Issue 2]: Description, files affected, recommendation
-
-#### Principle Violations
-- **[PRINCIPLE]**: Description of violation
-  - Files: `file1.ext`, `file2.ext`
-  - Recommendation: How to fix
-
-### Cross-Cutting Concerns
-
-*Issues that span multiple languages or the entire codebase.*
-
-- [Issue]: Description and recommendation
-
-### Actionable Tasks
-
-Priority-ordered list of improvements:
-
-- [ ] **High**: [Task description] - Files: [list]
-- [ ] **High**: [Task description] - Files: [list]
-- [ ] **Medium**: [Task description] - Files: [list]
-- [ ] **Low**: [Task description] - Files: [list]
-
-### Positive Observations
-
-Things done well that should be maintained:
-- [Good practice 1]
-- [Good practice 2]
 ```
+Generate a TASKS.md for codebase review remediation.
+
+## Goal
+Fix code quality issues identified during codebase review.
+
+## Project Context
+- **Technologies:** [Languages, frameworks, build tools detected]
+- **Build command:** [detected build command]
+- **Test command:** [detected test command]
+- **Review scope:** [quick/standard/comprehensive]
+
+## Key Conventions (from documentation)
+- [Convention 1]
+- [Convention 2]
+
+## Findings
+
+### High Priority (Critical issues affecting correctness or maintainability)
+
+- **[PRINCIPLE]**: [Brief description]
+  - Files: `file1.ext:line`, `file2.ext:line`
+  - Action: [Specific action to take]
+  - Verify: [How to verify the fix]
+
+[Repeat for each high priority finding]
+
+### Medium Priority (Consistency and pattern improvements)
+
+- **[CATEGORY]**: [Brief description]
+  - Files: `file1.ext`, `file2.ext`
+  - Action: [Specific action to take]
+  - Verify: [How to verify the fix]
+
+[Repeat for each medium priority finding]
+
+### Low Priority (Minor improvements and cleanup)
+
+- **[CATEGORY]**: [Brief description]
+  - Files: `file1.ext`
+  - Action: [Specific action to take]
+  - Verify: [How to verify the fix]
+
+[Repeat for each low priority finding]
+
+## Positive Observations (patterns to maintain)
+- [Observation 1]
+- [Observation 2]
+
+## Notes
+- [Any blockers or dependencies between tasks]
+```
+
+**Why use pm7y-ralph-planner:**
+
+The planner will:
+1. Add proper validation requirements (build, test, lint checks)
+2. Include the Learnings Log section for preserving insights across iterations
+3. Add the iteration workflow guidance
+4. Format tasks for optimal autonomous execution
 
 ---
 
@@ -286,110 +298,98 @@ Things done well that should be maintained:
 
 ALWAYS read available documentation before analyzing code. Understanding stated conventions prevents false positives.
 
-### Rule 2: Separate Analyses by Language/Area
+### Rule 2: Autonomous-Friendly Findings
 
-ALWAYS analyze different languages and logical areas separately. Each language has its own idioms, patterns, and best practices.
+Every finding MUST be:
+- **Self-contained** - Can be completed in isolation
+- **Specific** - Exact files and line numbers
+- **Verifiable** - Clear success criteria
+- **Safe** - Include test verification step
 
 ### Rule 3: Context Over Rules
 
 Apply principles pragmatically. Small amounts of duplication may be acceptable. Simple code may look "boring" but is often correct. Consider the context before flagging violations.
 
-### Rule 4: Actionable Output
+### Rule 4: Prioritize Correctly
 
-Every finding MUST have:
-- Specific files affected
-- Clear description of the issue
-- Concrete recommendation for improvement
-- Priority level (High/Medium/Low)
+- **High**: Bugs, security issues, principle violations causing real problems
+- **Medium**: Inconsistencies, pattern violations, maintainability issues
+- **Low**: Style nitpicks, minor cleanup, optional improvements
 
-### Rule 5: Preserve Existing Content
+### Rule 5: Use pm7y-ralph-planner
 
-When writing to `CODEBASE_REVIEW.md`:
-- Create the file if it doesn't exist
-- Append new review as a new section
-- Never overwrite previous reviews
-- Use clear date/time headers
+ALWAYS pass findings to `pm7y-ralph-planner` for TASKS.md generation. This ensures proper validation requirements, learnings tracking, and iteration workflow are included.
 
 ---
 
 ## Output Format
 
-The report MUST be written to `CODEBASE_REVIEW.md` in the repository root.
+The analysis produces structured findings that are passed to `pm7y-ralph-planner`. The planner handles TASKS.md generation.
 
-**File structure:**
+**Finding Format Requirements:**
+
+Each finding must include:
+1. **Category tag** in bold (e.g., `**DRY**`, `**KISS**`, `**Naming**`)
+2. **Brief description** of the issue
+3. **Files** with specific paths and line numbers where possible
+4. **Action** describing exactly what to do
+5. **Verify** explaining how to confirm the fix worked
+
+**Example Finding:**
+
 ```markdown
-# Codebase Review Log
-
-This file contains periodic codebase reviews with findings and actionable improvements.
-
----
-
-## Review: 2025-01-17 14:30 UTC
-
-[Review content...]
-
----
-
-## Review: 2025-01-10 09:15 UTC
-
-[Previous review content...]
+- **DRY**: Duplicate email validation logic
+  - Files: `src/controllers/UserController.cs:45-60`, `src/controllers/AdminController.cs:32-47`
+  - Action: Extract shared validation to `src/helpers/ValidationHelpers.cs` as `ValidateEmail()` method. Update both controllers to use the shared helper.
+  - Verify: Run `dotnet test` - all tests pass. Grep for email regex - only one occurrence.
 ```
 
 ---
 
 ## Validation Checklist
 
-Before finalizing the review:
+Before passing findings to pm7y-ralph-planner:
 
 - [ ] Read all available documentation (README, CLAUDE.md, etc.)
-- [ ] Detected and documented all languages/frameworks present
+- [ ] Detected and documented all languages/frameworks
 - [ ] Analyzed patterns and idioms for each detected language
-- [ ] Applied KISS principle evaluation
-- [ ] Applied DRY principle evaluation
-- [ ] Applied POLA principle evaluation
-- [ ] Applied YAGNI principle evaluation
+- [ ] Applied KISS, DRY, POLA, YAGNI principle evaluations
 - [ ] Used Context7 for current best practice verification (if needed)
 - [ ] All findings have specific file references
-- [ ] All findings have actionable recommendations
-- [ ] Tasks are prioritized (High/Medium/Low)
-- [ ] Positive observations included
-- [ ] Report appended to CODEBASE_REVIEW.md (not overwritten)
+- [ ] All findings have clear Action and Verify steps
+- [ ] Findings are correctly prioritized (High/Medium/Low)
+- [ ] Positive observations documented
+- [ ] Invoked pm7y-ralph-planner with structured findings
 
 ---
 
 ## Examples
 
-### Example: DRY Violation
+### Example: High Priority DRY Task
 
-**Finding:**
 ```markdown
-#### Principle Violations
-- **DRY**: Duplicate validation logic
-  - Files: `UserController.cs:45-60`, `AdminController.cs:32-47`
-  - Issue: Same email validation regex and error handling duplicated
-  - Recommendation: Extract to `ValidationHelpers.ValidateEmail()` method
+- [ ] **DRY**: Duplicate validation logic
+  - Files: `src/controllers/UserController.cs:45-60`, `src/controllers/AdminController.cs:32-47`
+  - Action: Extract email validation regex and error handling to `src/helpers/ValidationHelpers.ValidateEmail()`. Update both controllers to use shared helper.
+  - Verify: `dotnet test` passes. Only one email regex in codebase.
 ```
 
-### Example: KISS Violation
+### Example: Medium Priority KISS Task
 
-**Finding:**
 ```markdown
-#### Principle Violations
-- **KISS**: Over-abstracted service layer
-  - Files: `Services/UserService.cs`, `Services/IUserService.cs`, `Services/UserServiceBase.cs`, `Services/UserServiceExtensions.cs`
-  - Issue: Single responsibility split across 4 files with unnecessary base class and extensions
-  - Recommendation: Consolidate to single `UserService.cs` with interface
+- [ ] **KISS**: Over-abstracted service layer
+  - Files: `src/Services/UserService.cs`, `src/Services/IUserService.cs`, `src/Services/UserServiceBase.cs`, `src/Services/UserServiceExtensions.cs`
+  - Action: Consolidate to single `UserService.cs` with interface `IUserService.cs`. Remove unnecessary base class and extensions.
+  - Verify: `dotnet build` succeeds. `dotnet test` passes. Service still injectable via DI.
 ```
 
-### Example: Pattern Inconsistency
+### Example: Low Priority Naming Task
 
-**Finding:**
 ```markdown
-#### Inconsistencies Found
-- **Hook naming**: Mixed conventions
-  - Files: `useAuth.ts`, `useFetchData.ts`, `UseCart.tsx`
-  - Issue: Inconsistent casing (camelCase vs PascalCase) and file extensions (.ts vs .tsx for non-component hooks)
-  - Recommendation: Standardize to camelCase with .ts extension for hooks
+- [ ] **Naming**: Inconsistent hook file naming
+  - Files: `src/hooks/useAuth.ts`, `src/hooks/useFetchData.ts`, `src/hooks/UseCart.tsx`
+  - Action: Rename `UseCart.tsx` to `useCart.ts` (camelCase, .ts extension for non-component hooks).
+  - Verify: `npm run build` succeeds. `npm test` passes. No import errors.
 ```
 
 ---
