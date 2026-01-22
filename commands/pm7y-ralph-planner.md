@@ -13,7 +13,7 @@ Invoke the `pm7y-ralph-planner` agent to run the interactive planning process.
 
 ```
 Task tool:
-  subagent_type: pm7y-ralph-planner
+  subagent_type: pm7y-claude-code:pm7y-ralph-planner
   description: "Plan tasks for ralph loop"
   prompt: |
     [Include any initial prompt/description the user provided]

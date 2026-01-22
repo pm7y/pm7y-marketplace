@@ -259,7 +259,6 @@ Once approved:
 3. **Confirm** - "TASKS.md created with X tasks."
 4. **Next steps** - Explain the two execution options:
    - **`/pm7y-ralph-loop`** (recommended): Sets up scripts for fresh Claude sessions per task - best for long-running work
-   - **`pm7y-ralph-tasks` agent**: Completes all tasks in one session using worker subagents - faster but uses more context
 
 ## Example Session
 
