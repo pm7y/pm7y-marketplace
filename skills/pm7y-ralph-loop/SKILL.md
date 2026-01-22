@@ -15,8 +15,9 @@ The Ralph Wiggum technique involves running Claude in a continuous loop, spawnin
 The PowerShell scripts are located at:
 
 ```
-${CLAUDE_PLUGIN_ROOT}/skills/pm7y-ralph-loop/ralph-loop.ps1  # Continuous loop
-${CLAUDE_PLUGIN_ROOT}/skills/pm7y-ralph-loop/ralph-once.ps1  # Single execution
+${CLAUDE_PLUGIN_ROOT}/skills/pm7y-ralph-loop/ralph-loop.ps1      # Continuous loop
+${CLAUDE_PLUGIN_ROOT}/skills/pm7y-ralph-loop/ralph-once.ps1      # Single execution
+${CLAUDE_PLUGIN_ROOT}/skills/pm7y-ralph-loop/ralph-visualize.ps1 # Output visualizer
 ```
 
 ## What You Do
@@ -24,7 +25,7 @@ ${CLAUDE_PLUGIN_ROOT}/skills/pm7y-ralph-loop/ralph-once.ps1  # Single execution
 When this skill is invoked:
 
 1. **Check for PowerShell Core** - Verify `pwsh` is available
-2. **Copy the scripts** - Copy `ralph-loop.ps1` and `ralph-once.ps1` from the plugin to the current directory
+2. **Copy the scripts** - Copy all three scripts (`ralph-loop.ps1`, `ralph-once.ps1`, `ralph-visualize.ps1`) to the current directory
 3. **Explain usage** - Show the user how to run and customize
 4. **Suggest task planning** - Recommend using `pm7y-ralph-planner` if no TASKS.md exists
 
@@ -44,10 +45,11 @@ If not installed, advise:
 
 ### Step 2: Copy the Scripts
 
-Copy both scripts from the plugin to the user's current directory:
+Copy all three scripts from the plugin to the user's current directory:
 
 - `${CLAUDE_PLUGIN_ROOT}/skills/pm7y-ralph-loop/ralph-loop.ps1` → `./ralph-loop.ps1`
 - `${CLAUDE_PLUGIN_ROOT}/skills/pm7y-ralph-loop/ralph-once.ps1` → `./ralph-once.ps1`
+- `${CLAUDE_PLUGIN_ROOT}/skills/pm7y-ralph-loop/ralph-visualize.ps1` → `./ralph-visualize.ps1`
 
 ### Step 3: Check for TASKS.md
 
@@ -82,8 +84,9 @@ pwsh ./ralph-once.ps1 -NoVisualize
 |-----------|---------|-------------|
 | `-PromptFile` | TASKS.md | Path to the prompt/task file |
 | `-Model` | opus | Claude model (sonnet, opus, haiku) |
-| `-NoVisualize` | false | Skip repomirror visualization |
+| `-NoVisualize` | false | Skip piping output through the visualizer |
 | `-Quiet` | false | Suppress status messages |
+| `-AutoCommit` | false | Auto-commit changes with Claude-generated message |
 
 ### ralph-loop.ps1 (Continuous Loop)
 
@@ -99,7 +102,7 @@ pwsh ./ralph-loop.ps1 -PromptFile "tasks.md" -Model "sonnet" -SleepSeconds 30
 # Limited iterations (for testing)
 pwsh ./ralph-loop.ps1 -MaxIterations 5
 
-# Without repomirror visualization
+# Without visualization
 pwsh ./ralph-loop.ps1 -NoVisualize
 ```
 
@@ -109,21 +112,22 @@ pwsh ./ralph-loop.ps1 -NoVisualize
 | `-Model` | opus | Claude model (sonnet, opus, haiku) |
 | `-SleepSeconds` | 10 | Seconds between iterations |
 | `-MaxIterations` | 25 | Max iterations (0 = unlimited) |
-| `-NoVisualize` | false | Skip repomirror visualization |
+| `-NoVisualize` | false | Skip piping output through the visualizer |
+| `-AutoCommit` | false | Auto-commit changes with Claude-generated message |
 
 **Prerequisites:**
 
 - PowerShell Core (`pwsh`) - Install via `brew install powershell` (macOS) or from Microsoft
 - Claude CLI (`claude`) - Install from <https://claude.ai/code>
-- Node.js/npm (for repomirror visualization, optional)
 
 **Stop the loop:** Press `Ctrl+C`
 
 ## Checklist
 
 - [ ] Check if `pwsh` is available, suggest installation if not
-- [ ] Copy `ralph-loop.ps1` from plugin to current directory
-- [ ] Copy `ralph-once.ps1` from plugin to current directory
+- [ ] Copy `ralph-loop.ps1` from plugin to current directory (DO NOT modify it)
+- [ ] Copy `ralph-once.ps1` from plugin to current directory (DO NOT modify it)
+- [ ] Copy `ralph-visualize.ps1` from plugin to current directory (DO NOT modify it)
 - [ ] Check if `TASKS.md` exists
 - [ ] If no TASKS.md, suggest using `pm7y-ralph-planner` to create one
 - [ ] Explain usage to user

@@ -21,7 +21,7 @@
     Maximum number of loop iterations (default: 25)
 
 .PARAMETER NoVisualize
-    Skip piping output to repomirror visualize
+    Skip piping output through the visualizer
 
 .PARAMETER AutoCommit
     Automatically commit changes after each iteration with a Claude-generated message
@@ -71,9 +71,14 @@ if (-not (Get-Command "claude" -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
-# Verify npx is available (for repomirror)
-if (-not $NoVisualize -and -not (Get-Command "npx" -ErrorAction SilentlyContinue)) {
-    Write-Warning "npx not found - disabling visualization"
+# Get script directory for visualizer
+$scriptDir = $PSScriptRoot
+if (-not $scriptDir) { $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path }
+$visualizerPath = Join-Path $scriptDir "ralph-visualize.ps1"
+
+# Verify visualizer exists
+if (-not $NoVisualize -and -not (Test-Path $visualizerPath)) {
+    Write-Warning "Visualizer not found at $visualizerPath - disabling visualization"
     $NoVisualize = $true
 }
 
@@ -122,7 +127,7 @@ try {
                 --output-format=stream-json `
                 --model=$Model `
                 --verbose `
-                | npx repomirror visualize
+                | & $visualizerPath
         }
 
         # Auto-commit if enabled and there are changes

@@ -129,6 +129,56 @@ For each file in scope, read the content and check for issues:
 | `@extend` usage | Any use of `@extend` | Low |
 | Deep SCSS nesting | > 3 levels of SCSS nesting | Low |
 
+#### Existing Pattern Violation Detection
+
+This detection leverages the pattern inventory from Step 2 to identify when new/changed code violates or duplicates established patterns. Use the same discovery approach as `pm7y-scss-patterns` skill.
+
+| Issue | Pattern | Severity |
+|-------|---------|----------|
+| Duplicate mixin | New mixin does the same thing as existing mixin with different name | High |
+| Duplicate variable | New variable serves same purpose as existing variable (e.g., two `$primary-color` and `$brand-color` both #3B82F6) | High |
+| Duplicate utility class | New utility class provides same styles as existing utility | High |
+| Naming convention violation | New class doesn't follow established naming pattern (BEM, OOCSS, etc.) | Medium |
+| Variable value mismatch | Using hardcoded value when matching variable exists | Medium |
+| Inconsistent mixin usage | Not using established mixin where it would apply | Low |
+
+**Detection approach:**
+
+1. **Duplicate mixins:** Compare new `@mixin` definitions against existing mixins. Two mixins are duplicates if they produce equivalent CSS output (same properties and values). Flag when a new mixin's body matches an existing mixin's body.
+
+2. **Duplicate variables:** Compare new `$variable` definitions against existing variables. Flag when:
+   - Two variables have the same value (exact match)
+   - Two color variables are visually identical (hex/rgb equivalence)
+   - Two spacing variables resolve to the same pixel value
+
+3. **Duplicate utility classes:** Compare new class definitions against existing utilities. Flag when a new class has the same declarations as an existing utility class.
+
+4. **Naming convention violations:** If the codebase uses BEM (`.block__element--modifier`), flag classes that don't follow this pattern. Similarly for other conventions detected in the inventory phase.
+
+**Example violations:**
+
+```scss
+// DUPLICATE MIXIN - existing @mixin flex-center does the same thing
+@mixin center-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// DUPLICATE VARIABLE - $color-primary already equals #3B82F6
+$brand-blue: #3B82F6;
+
+// DUPLICATE UTILITY - .flex-center already exists with same styles
+.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// NAMING CONVENTION VIOLATION - project uses BEM but this doesn't
+.cardHeader { } // Should be .card__header
+```
+
 ### Step 5: Pass Findings to pm7y-ralph-planner
 
 After completing the analysis, invoke the `pm7y-ralph-planner` agent using the Task tool. Pass your findings as structured input so the planner can generate a proper TASKS.md with validation requirements and learnings tracking.
@@ -186,10 +236,13 @@ Fix CSS/SCSS issues identified during code review.
 
 - **src/components/Header.scss:67** - Deep nesting: Selector `.header .nav .menu .item a` has 5 levels. **Fix:** Flatten to `.header-nav-link` or similar BEM-style class.
 - **src/styles/buttons.scss:23** - Single-use mixin: `@mixin button-shadow` is only used once. **Fix:** Inline the mixin content directly into `.primary-button`.
+- **src/styles/utils.scss:45** - Duplicate mixin: `@mixin center-content` produces same CSS as existing `@mixin flex-center` in `_mixins.scss:12`. **Fix:** Remove `@mixin center-content` and use `@include flex-center` instead.
+- **src/components/Card.scss:8** - Duplicate variable: `$brand-blue: #3B82F6` duplicates existing `$color-primary` in `_variables.scss:5`. **Fix:** Remove `$brand-blue` and use `$color-primary`.
 
 ### LOW Priority
 
 - **src/styles/layout.scss:89** - Over-qualified selector: `div.container` can be simplified. **Fix:** Remove element qualifier, use `.container` only.
+- **src/components/Modal.scss:15** - Naming convention violation: `.modalHeader` doesn't follow BEM pattern used in codebase. **Fix:** Rename to `.modal__header`.
 ```
 
 **Why use pm7y-ralph-planner:**

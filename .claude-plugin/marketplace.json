@@ -12,7 +12,7 @@
       "name": "pm7y-claude-code",
       "source": "./",
       "description": "Personal Claude Code setup with commands, skills, agents, and MCP servers",
-      "version": "1.8.0",
+      "version": "1.8.2",
       "author": {
         "name": "pm7y",
         "email": "3075792+pm7y@users.noreply.github.com"
